@@ -26,7 +26,7 @@ func InitDb() {
 	//表名禁用复数
 	db.SingularTable(true)
 
-	db.AutoMigrate(&User{}, &Category{}, &Article{})
+	//db.AutoMigrate(&User{}, &Category{}, &Article{})
 	// 设置连接池中的最大闲置连接数
 	db.DB().SetMaxIdleConns(10)
 	// 设置数据库中的最大连接数

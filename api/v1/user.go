@@ -3,6 +3,7 @@ package v1
 import (
 	"Gin-Blog/model"
 	"Gin-Blog/utils/errmsg"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -26,7 +27,8 @@ func AddUser(c *gin.Context) {
 
 	code := model.CheckUser(user.Username)
 	if code == errmsg.SUCCESS {
-		model.CreateUser(&user)
+		// 开始创建用户
+		code = model.CreateUser(&user)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status": code,
@@ -58,10 +60,34 @@ func GetUsers(c *gin.Context) {
 
 // EditUser 编辑用户
 func EditUser(c *gin.Context) {
+	var data model.User
+	id, _ := strconv.Atoi(c.Param("id"))
+	c.ShouldBindJSON(&data)
+	fmt.Println("id:", id)
+	fmt.Println("username", data.Username)
+	fmt.Println("role", data.Role)
 
+	code := model.CheckUser(data.Username)
+	if code == errmsg.ERROR_USERNAME_USED {
+		c.JSON(http.StatusOK, gin.H{
+			"status": code,
+			"msg":    errmsg.GetErrMsg(code),
+		})
+		return
+	}
+	code = model.EditUser(id, &data)
+	c.JSON(http.StatusOK, gin.H{
+		"status": code,
+		"msg":    errmsg.GetErrMsg(code),
+	})
 }
 
 // DeleteUser 删除用户
 func DeleteUser(c *gin.Context) {
-
+	id, _ := strconv.Atoi(c.Param("id"))
+	code := model.DeleteUsers(id)
+	c.JSON(http.StatusOK, gin.H{
+		"status": code,
+		"msg":    errmsg.GetErrMsg(code),
+	})
 }
